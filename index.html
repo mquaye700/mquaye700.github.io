@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Michael Quaye | Personal Page</title>
-    <meta name="description" content="Personal website for Michael Quaye: developer, designer, and creator." />
+    <title>Michael Quaye | Designer &amp; Developer</title>
+    <meta name="description" content="Personal website for Michael Quaye — developer, designer, and creative technologist." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -19,10 +19,11 @@
           <span></span>
           <span></span>
         </button>
-        <nav id="main-navigation" class="site-nav">
+        <nav id="main-navigation" class="site-nav closed">
           <a href="#about">About</a>
-          <a href="#work">Work</a>
+          <a href="#expertise">Expertise</a>
           <a href="#projects">Projects</a>
+          <a href="#experience">Experience</a>
           <a href="#contact">Contact</a>
         </nav>
       </div>
@@ -30,62 +31,99 @@
 
     <main>
       <section id="home" class="hero-section">
-        <div class="container hero-content">
-          <p class="eyebrow">Hello, I’m Michael.</p>
-          <h1>I build modern web experiences and share ideas that help people move forward.</h1>
-          <p class="hero-copy">
-            I’m a developer focused on clean interfaces, fast performance, and practical solutions. Explore my work, learn about my skills, and connect if you'd like to collaborate.
-          </p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="#projects">See Projects</a>
-            <a class="button button-secondary" href="#contact">Contact Me</a>
+        <div class="container hero-grid">
+          <div class="hero-copy" data-reveal>
+            <p class="eyebrow">Hi, I’m Michael.</p>
+            <h1>Designing fast, elegant web experiences for ambitious individuals and teams.</h1>
+            <p>
+              I build polished interfaces, optimize front-end performance, and help ideas come alive through thoughtful design and clean code.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#projects">View Work</a>
+              <a class="button button-outline" href="#contact">Get in Touch</a>
+            </div>
+            <div class="hero-badges">
+              <span>Frontend development</span>
+              <span>Design systems</span>
+              <span>High-performance sites</span>
+            </div>
           </div>
+
+          <aside class="hero-panel" data-reveal>
+            <div class="hero-panel-inner">
+              <p class="panel-label">Next launch</p>
+              <h2>Interactive portfolio refresh</h2>
+              <p>Building a streamlined showcase for modern web projects with a strong focus on accessibility and performance.</p>
+              <div class="panel-stat">
+                <strong>+40%</strong>
+                <span>Improved load times expected</span>
+              </div>
+            </div>
+          </aside>
         </div>
       </section>
 
       <section id="about" class="section about-section">
         <div class="container section-grid">
-          <div>
+          <div class="content-card" data-reveal>
             <h2>About Me</h2>
             <p>
-              I’m a personal website owner, developer, and lifelong learner. I enjoy building thoughtful digital experiences, designing intuitive interfaces, and solving problems with code.
+              I combine design thinking with front-end development to build websites that feel effortless and work reliably. My focus is on user clarity, clean interactions, and measurable results.
             </p>
             <p>
-              This site is a place to show what I’m working on, share my story, and make it easy for visitors to connect.
+              From landing pages to web applications, I enjoy solving problems with elegant interfaces and scalable structure.
             </p>
+            <div class="about-list">
+              <div>
+                <strong>Based in</strong>
+                <span>Accra, Ghana</span>
+              </div>
+              <div>
+                <strong>Specialty</strong>
+                <span>UX-led web experiences</span>
+              </div>
+              <div>
+                <strong>Availability</strong>
+                <span>Freelance &amp; collaboration</span>
+              </div>
+            </div>
           </div>
-          <div class="stats-grid">
-            <div class="stat-card">
-              <strong>5+</strong>
-              <span>Years building websites</span>
-            </div>
-            <div class="stat-card">
-              <strong>10+</strong>
-              <span>Projects completed</span>
-            </div>
-            <div class="stat-card">
-              <strong>100%</strong>
-              <span>Focused on quality</span>
-            </div>
+
+          <div class="values-card" data-reveal>
+            <h3>Working with me means</h3>
+            <ul>
+              <li>Clear communication and honest timelines</li>
+              <li>Performance-first architecture</li>
+              <li>Accessible interfaces for real users</li>
+              <li>Design systems that grow with your project</li>
+            </ul>
           </div>
         </div>
       </section>
 
-      <section id="work" class="section work-section">
+      <section id="expertise" class="section expertise-section">
         <div class="container">
-          <h2>What I Do</h2>
-          <div class="cards-grid">
-            <article class="feature-card">
-              <h3>Web Development</h3>
-              <p>Building modern, accessible websites using HTML, CSS, JavaScript, and lightweight frameworks.</p>
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">What I do best</p>
+            <h2>Core expertise</h2>
+            <p>Front-end solutions built to scale — from accessible websites to polished product experiences.</p>
+          </div>
+          <div class="expertise-grid">
+            <article class="expertise-card" data-reveal>
+              <h3>Front-end engineering</h3>
+              <p>JavaScript, modern CSS, responsive layouts, and semantic HTML for fast, maintainable UIs.</p>
             </article>
-            <article class="feature-card">
-              <h3>Design Systems</h3>
-              <p>Creating consistent component libraries, responsive layouts, and polished interfaces.</p>
+            <article class="expertise-card" data-reveal>
+              <h3>Design systems</h3>
+              <p>Reusable components, shared patterns, and scalable systems that keep interfaces consistent and easy to update.</p>
             </article>
-            <article class="feature-card">
+            <article class="expertise-card" data-reveal>
               <h3>Performance</h3>
-              <p>Optimizing load times, improving interactions, and delivering fast experiences on every device.</p>
+              <p>Optimized asset loading, smooth interactions, and measurable improvements for every screen.</p>
+            </article>
+            <article class="expertise-card" data-reveal>
+              <h3>Product strategy</h3>
+              <p>Refining goals, prioritizing features, and aligning execution with user impact.</p>
             </article>
           </div>
         </div>
@@ -93,40 +131,97 @@
 
       <section id="projects" class="section projects-section">
         <div class="container">
-          <div class="section-heading">
-            <h2>Featured Projects</h2>
-            <p>Examples of the work I’m most proud of, with clean execution and practical value.</p>
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">Recent work</p>
+            <h2>Highlighted projects</h2>
+            <p>Selected projects that demonstrate thoughtful design, strong execution, and measurable value.</p>
           </div>
           <div class="project-grid">
-            <article class="project-card">
-              <h3>Portfolio Website</h3>
-              <p>A responsive personal site built to showcase projects, share ideas, and connect with visitors.</p>
+            <article class="project-card" data-reveal>
+              <span class="project-tag">Brand site</span>
+              <h3>Launch-ready portfolio</h3>
+              <p>A polished portfolio site with fast interactions, accessible navigation, and clean visuals.</p>
+              <a href="#contact" class="project-link">Discuss a similar build</a>
             </article>
-            <article class="project-card">
-              <h3>Landing Page</h3>
-              <p>An optimized landing page designed for speed, clarity, and high conversion.</p>
+            <article class="project-card featured" data-reveal>
+              <span class="project-tag">Marketing</span>
+              <h3>Conversion-driven landing page</h3>
+              <p>Designed for strong performance across devices, with clear messaging and simple lead capture flows.</p>
+              <a href="#contact" class="project-link">Ask about this project</a>
             </article>
-            <article class="project-card">
-              <h3>Web App Interface</h3>
-              <p>An interface with polished interactions, thoughtful visual hierarchy, and responsive behavior.</p>
+            <article class="project-card" data-reveal>
+              <span class="project-tag">UI refresh</span>
+              <h3>Product interface upgrade</h3>
+              <p>Improved clarity, consistency, and usability for a customer-facing application interface.</p>
+              <a href="#contact" class="project-link">Start a project</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="experience" class="section experience-section">
+        <div class="container">
+          <div class="section-heading" data-reveal>
+            <p class="eyebrow">Background</p>
+            <h2>Professional experience</h2>
+          </div>
+          <div class="timeline" data-reveal>
+            <article class="timeline-item">
+              <span class="timeline-year">2025</span>
+              <div>
+                <h3>Senior Front-end Developer</h3>
+                <p>Leading design-focused web projects with a focus on accessibility and performance.</p>
+              </div>
+            </article>
+            <article class="timeline-item">
+              <span class="timeline-year">2023</span>
+              <div>
+                <h3>Freelance consultant</h3>
+                <p>Delivered responsive web experiences and marketing sites for startups and agencies.</p>
+              </div>
+            </article>
+            <article class="timeline-item">
+              <span class="timeline-year">2021</span>
+              <div>
+                <h3>Product designer</h3>
+                <p>Built user-centered interfaces and design systems for digital products.</p>
+              </div>
             </article>
           </div>
         </div>
       </section>
 
       <section id="contact" class="section contact-section">
-        <div class="container contact-card">
-          <h2>Let’s Connect</h2>
-          <p>Send an email or start a conversation on GitHub to talk about your next idea.</p>
-          <a class="button button-primary" href="mailto:hello@mquaye700.com">hello@mquaye700.com</a>
+        <div class="container contact-grid" data-reveal>
+          <div class="contact-panel">
+            <h2>Ready to collaborate?</h2>
+            <p>Whether you need a new website, a product refresh, or help turning an idea into a polished digital experience, I’d love to hear from you.</p>
+            <div class="contact-meta">
+              <div>
+                <strong>Email</strong>
+                <span>hello@mquaye700.com</span>
+              </div>
+              <div>
+                <strong>GitHub</strong>
+                <span><a href="https://github.com/mquaye700" target="_blank" rel="noreferrer">github.com/mquaye700</a></span>
+              </div>
+            </div>
+          </div>
+          <div class="contact-card">
+            <p>Send a quick note and I’ll follow up with your next step.</p>
+            <a class="button button-primary" href="mailto:hello@mquaye700.com">Email Me</a>
+          </div>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
       <div class="container footer-inner">
-        <p>© 2026 Michael Quaye. Built with HTML, CSS, and JavaScript.</p>
-        <p><a href="https://github.com/mquaye700" target="_blank" rel="noreferrer">GitHub</a></p>
+        <p>© 2026 Michael Quaye.</p>
+        <div class="footer-links">
+          <a href="https://github.com/mquaye700" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="mailto:hello@mquaye700.com">Email</a>
+        </div>
       </div>
     </footer>
 
