@@ -46,3 +46,600 @@ if ('IntersectionObserver' in window) {
 } else {
   revealItems.forEach((item) => item.classList.add('revealed'));
 }
+
+// ========== CHATBOT FUNCTIONALITY ==========
+
+const chatbotToggle = document.getElementById('chatbotToggle');
+const chatbotClose = document.getElementById('chatbotClose');
+const chatbotPanel = document.getElementById('chatbotPanel');
+const chatbotInput = document.getElementById('chatbotInput');
+const chatbotSend = document.getElementById('chatbotSend');
+const chatbotMessages = document.getElementById('chatbotMessages');
+const chatbotSuggestions = document.getElementById('chatbotSuggestions');
+
+// Chatbot responses
+const responses = {
+  'what do you do?': {
+    reply: 'I design and build polished, high-performance web experiences. I specialize in front-end engineering, design systems, and creating interfaces that users love. From landing pages to web applications, I help turn ideas into elegant digital products.'
+  },
+  'availability?': {
+    reply: 'I\u2019m available for freelance projects and collaborations. The best way to discuss your project timeline and needs is to email me directly at hello@mquaye700.com or check out my recent work to see if we\u2019re a good fit.'
+  },
+  'contact info?': {
+    reply: 'You can reach me at hello@mquaye700.com or visit my GitHub at github.com/mquaye700. I typically respond within 24 hours. Looking forward to connecting!'
+  },
+  'about you': {
+    reply: 'I\u2019m a designer and developer based in Accra, Ghana. I combine design thinking with front-end development to build websites that feel effortless and work reliably. I focus on user clarity, clean interactions, and measurable results.'
+  },
+  'expertise': {
+    reply: 'My core expertise includes front-end engineering (JavaScript, modern CSS, responsive design), design systems, performance optimization, and product strategy. I\u2019m passionate about building scalable solutions and creating great user experiences.'
+  },
+  'projects': {
+    reply: 'I\u2019ve worked on brand sites, conversion-driven landing pages, and product interface upgrades. Each project demonstrates thoughtful design, strong execution, and measurable value. Check out the \u201CRecent work\u201d section above to see examples.'
+  },
+  'services': {
+    reply: 'I offer front-end development, design system creation, performance optimization, and product strategy consulting. Whether you need a new website or a product refresh, I can help turn your vision into reality.'
+  },
+  'experience': {
+    reply: 'I\u2019ve spent the last several years building web experiences for startups and agencies. Currently, I\u2019m working as a Senior Front-end Developer, leading design-focused projects with emphasis on accessibility and performance.'
+  }
+};
+
+function toggleChatbot() {
+  chatbotPanel.classList.toggle('active');
+  if (chatbotPanel.classList.contains('active')) {
+    chatbotInput.focus();
+  }
+}
+
+function addMessage(text, isUser = false) {
+  const messageEl = document.createElement('div');
+  messageEl.className = isUser ? 'message user-message' : 'message bot-message';
+  const p = document.createElement('p');
+  p.textContent = text;
+  messageEl.appendChild(p);
+  chatbotMessages.appendChild(messageEl);
+  chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+}
+
+function getBotResponse(userMessage) {
+  const lowerMessage = userMessage.toLowerCase().trim();
+  
+  // Direct match
+  if (responses[lowerMessage]) {
+    return responses[lowerMessage].reply;
+  }
+  
+  // Partial match
+  for (const [key, value] of Object.entries(responses)) {
+    if (lowerMessage.includes(key.split('?')[0].toLowerCase()) || 
+        key.includes(lowerMessage.split('?')[0])) {
+      return value.reply;
+    }
+  }
+  
+  // Check for keywords
+  if (lowerMessage.includes('contact') || lowerMessage.includes('email') || lowerMessage.includes('reach')) {
+    return responses['contact info?'].reply;
+  }
+  if (lowerMessage.includes('do') || lowerMessage.includes('service') || lowerMessage.includes('build')) {
+    return responses['what do you do?'].reply;
+  }
+  if (lowerMessage.includes('available') || lowerMessage.includes('hire') || lowerMessage.includes('work')) {
+    return responses['availability?'].reply;
+  }
+  if (lowerMessage.includes('skill') || lowerMessage.includes('expert') || lowerMessage.includes('tech')) {
+    return responses['expertise'].reply;
+  }
+  if (lowerMessage.includes('portfolio') || lowerMessage.includes('work') || lowerMessage.includes('project')) {
+    return responses['projects'].reply;
+  }
+  
+  // Default response
+  return 'That\u2019s a great question! Feel free to email me at hello@mquaye700.com for more details, or explore my work above. I\u2019m happy to discuss how I can help!';
+}
+
+function sendMessage(message = null) {
+  const text = message || chatbotInput.value.trim();
+  
+  if (!text) return;
+  
+  // Add user message
+  addMessage(text, true);
+  chatbotInput.value = '';
+  
+  // Hide suggestions after first message
+  if (chatbotSuggestions.style.display !== 'none') {
+    chatbotSuggestions.style.display = 'none';
+  }
+  
+  // Simulate bot typing delay
+  setTimeout(() => {
+    const botResponse = getBotResponse(text);
+    addMessage(botResponse, false);
+  }, 500);
+}
+
+// Event listeners
+chatbotToggle.addEventListener('click', toggleChatbot);
+chatbotClose.addEventListener('click', toggleChatbot);
+chatbotSend.addEventListener('click', () => sendMessage());
+
+chatbotInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    sendMessage();
+  }
+});
+
+// Close chatbot when clicking outside
+document.addEventListener('click', (e) => {
+  const widget = document.getElementById('chatbotWidget');
+  if (!widget.contains(e.target) && chatbotPanel.classList.contains('active')) {
+    toggleChatbot();
+  }
+});
+
+// ========== GAME FUNCTIONALITY ==========
+
+function startGame(gameType) {
+  const modal = document.getElementById('gameModal');
+  const gameContainer = document.getElementById('gameContainer');
+  gameContainer.innerHTML = '';
+  
+  switch(gameType) {
+    case 'rps':
+      initRockPaperScissors(gameContainer);
+      break;
+    case 'memory':
+      initMemoryGame(gameContainer);
+      break;
+    case 'guess':
+      initNumberGuessing(gameContainer);
+      break;
+    case 'tictactoe':
+      initTicTacToe(gameContainer);
+      break;
+    case 'colorclicker':
+      initColorClicker(gameContainer);
+      break;
+    case 'wordscramble':
+      initWordScramble(gameContainer);
+      break;
+  }
+  
+  modal.classList.add('active');
+}
+
+function closeGame() {
+  const modal = document.getElementById('gameModal');
+  modal.classList.remove('active');
+}
+
+// Close game modal when clicking outside
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('gameModal');
+  if (e.target === modal) {
+    closeGame();
+  }
+});
+
+// ========== ROCK PAPER SCISSORS ==========
+function initRockPaperScissors(container) {
+  let playerScore = 0;
+  let computerScore = 0;
+  
+  container.innerHTML = `
+    <h2 class="game-title">🪨 Rock Paper Scissors</h2>
+    <p class="game-description">Choose your move!</p>
+    <div class="rps-container">
+      <div class="rps-choices">
+        <button class="rps-btn" onclick="playRPS('rock')">🪨 Rock</button>
+        <button class="rps-btn" onclick="playRPS('paper')">📄 Paper</button>
+        <button class="rps-btn" onclick="playRPS('scissors')">✂️ Scissors</button>
+      </div>
+      <div id="rpsResult" class="rps-result">Make your choice!</div>
+      <div id="rpsScore" class="rps-score">Player: 0 | Computer: 0</div>
+      <button class="rps-btn" style="margin-top: 1rem;" onclick="resetRPS()">Reset</button>
+    </div>
+  `;
+  
+  window.playRPS = function(choice) {
+    const choices = ['rock', 'paper', 'scissors'];
+    const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+    const choiceEmoji = { rock: '🪨', paper: '📄', scissors: '✂️' };
+    
+    let result = '';
+    if (choice === computerChoice) {
+      result = "It's a tie!";
+    } else if (
+      (choice === 'rock' && computerChoice === 'scissors') ||
+      (choice === 'paper' && computerChoice === 'rock') ||
+      (choice === 'scissors' && computerChoice === 'paper')
+    ) {
+      result = 'You win! 🎉';
+      playerScore++;
+    } else {
+      result = 'Computer wins! 🤖';
+      computerScore++;
+    }
+    
+    document.getElementById('rpsResult').innerHTML = 
+      `You chose ${choiceEmoji[choice]} | Computer chose ${choiceEmoji[computerChoice]}<br><strong>${result}</strong>`;
+    document.getElementById('rpsScore').textContent = 
+      `Player: ${playerScore} | Computer: ${computerScore}`;
+  };
+  
+  window.resetRPS = function() {
+    playerScore = 0;
+    computerScore = 0;
+    document.getElementById('rpsResult').innerHTML = 'Make your choice!';
+    document.getElementById('rpsScore').textContent = 'Player: 0 | Computer: 0';
+  };
+}
+
+// ========== MEMORY GAME ==========
+function initMemoryGame(container) {
+  const pairs = ['🍎', '🍌', '🍊', '🍇', '🍓', '🍉', '🍒', '🍑'];
+  const cards = [...pairs, ...pairs].sort(() => Math.random() - 0.5);
+  let flipped = [];
+  let matched = [];
+  let moves = 0;
+  
+  let html = `
+    <h2 class="game-title">🧠 Memory Game</h2>
+    <p class="game-description">Match the pairs!</p>
+    <div class="memory-grid" id="memoryGrid"></div>
+    <div class="memory-moves">Moves: <span id="moves">0</span></div>
+    <button class="rps-btn" style="margin-top: 1rem;" onclick="location.reload()">Reset</button>
+  `;
+  
+  container.innerHTML = html;
+  const grid = container.querySelector('#memoryGrid');
+  
+  cards.forEach((card, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'memory-card';
+    btn.innerHTML = '?';
+    btn.onclick = () => flipCard(btn, index);
+    grid.appendChild(btn);
+  });
+  
+  window.flipCard = function(btn, index) {
+    if (flipped.length < 2 && !matched.includes(index) && !btn.classList.contains('flipped')) {
+      btn.innerHTML = cards[index];
+      btn.classList.add('flipped');
+      flipped.push({ btn, index });
+      
+      if (flipped.length === 2) {
+        moves++;
+        document.getElementById('moves').textContent = moves;
+        
+        if (cards[flipped[0].index] === cards[flipped[1].index]) {
+          matched.push(flipped[0].index, flipped[1].index);
+          flipped[0].btn.classList.add('matched');
+          flipped[1].btn.classList.add('matched');
+          flipped = [];
+          
+          if (matched.length === cards.length) {
+            setTimeout(() => {
+              alert(`You won in ${moves} moves! 🎉`);
+            }, 500);
+          }
+        } else {
+          setTimeout(() => {
+            flipped[0].btn.innerHTML = '?';
+            flipped[0].btn.classList.remove('flipped');
+            flipped[1].btn.innerHTML = '?';
+            flipped[1].btn.classList.remove('flipped');
+            flipped = [];
+          }, 1000);
+        }
+      }
+    }
+  };
+}
+
+// ========== NUMBER GUESSING ==========
+function initNumberGuessing(container) {
+  const secretNumber = Math.floor(Math.random() * 100) + 1;
+  let attempts = 0;
+  
+  container.innerHTML = `
+    <h2 class="game-title">🎲 Guess the Number</h2>
+    <p class="game-description">I'm thinking of a number between 1 and 100</p>
+    <div class="guess-container">
+      <input type="number" class="guess-input" id="guessInput" min="1" max="100" placeholder="Enter your guess">
+      <button class="guess-btn" onclick="submitGuess()">Submit</button>
+      <div id="guessFeedback" class="guess-feedback">Start guessing!</div>
+      <div id="guessStats" class="guess-stats">Attempts: 0</div>
+    </div>
+  `;
+  
+  window.submitGuess = function() {
+    const input = document.getElementById('guessInput');
+    const guess = parseInt(input.value);
+    
+    if (!guess) {
+      document.getElementById('guessFeedback').innerHTML = 'Please enter a valid number!';
+      return;
+    }
+    
+    attempts++;
+    let feedback = '';
+    
+    if (guess === secretNumber) {
+      feedback = `🎉 Correct! The number was ${secretNumber}. You did it in ${attempts} attempts!<br><button class="guess-btn" style="margin-top: 0.5rem;" onclick="location.reload()">Play Again</button>`;
+    } else if (guess < secretNumber) {
+      feedback = `📈 Too low! Try a higher number.`;
+    } else {
+      feedback = `📉 Too high! Try a lower number.`;
+    }
+    
+    document.getElementById('guessFeedback').innerHTML = feedback;
+    document.getElementById('guessStats').textContent = `Attempts: ${attempts}`;
+    input.value = '';
+    input.focus();
+  };
+  
+  document.getElementById('guessInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') submitGuess();
+  });
+  
+  document.getElementById('guessInput').focus();
+}
+
+// ========== TIC TAC TOE ==========
+function initTicTacToe(container) {
+  const board = Array(9).fill('');
+  let gameActive = true;
+  let currentPlayer = 'X';
+  
+  container.innerHTML = `
+    <h2 class="game-title">⭕ Tic Tac Toe</h2>
+    <p class="game-description">You are X, I am O</p>
+    <div class="tictactoe-board" id="tictactoeBoard"></div>
+    <div class="tictactoe-status" id="tictactoeStatus">Your turn (X)</div>
+    <button class="rps-btn" style="margin-top: 1rem;" onclick="location.reload()">Reset</button>
+  `;
+  
+  const boardElement = container.querySelector('#tictactoeBoard');
+  
+  board.forEach((_, index) => {
+    const cell = document.createElement('button');
+    cell.className = 'tictactoe-cell';
+    cell.innerHTML = '';
+    cell.onclick = () => playerMove(index);
+    boardElement.appendChild(cell);
+  });
+  
+  function checkWinner() {
+    const winning = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+    
+    for (let combo of winning) {
+      if (board[combo[0]] && board[combo[0]] === board[combo[1]] && board[combo[0]] === board[combo[2]]) {
+        return board[combo[0]];
+      }
+    }
+    return null;
+  }
+  
+  function updateBoard() {
+    boardElement.querySelectorAll('.tictactoe-cell').forEach((cell, index) => {
+      cell.innerHTML = board[index];
+    });
+  }
+  
+  function computerMove() {
+    let available = board.map((cell, i) => !cell ? i : null).filter(i => i !== null);
+    if (available.length === 0) return;
+    
+    for (let i of available) {
+      board[i] = 'O';
+      if (checkWinner() === 'O') return;
+      board[i] = '';
+    }
+    
+    for (let i of available) {
+      board[i] = 'X';
+      if (checkWinner() === 'X') {
+        board[i] = 'O';
+        return;
+      }
+      board[i] = '';
+    }
+    
+    const randomMove = available[Math.floor(Math.random() * available.length)];
+    board[randomMove] = 'O';
+  }
+  
+  window.playerMove = function(index) {
+    if (!gameActive || board[index]) return;
+    
+    board[index] = 'X';
+    updateBoard();
+    
+    let winner = checkWinner();
+    if (winner) {
+      document.getElementById('tictactoeStatus').innerHTML = winner === 'X' ? 'You won! 🎉<button class="rps-btn" style="margin-top: 0.5rem;" onclick="location.reload()">Play Again</button>' : 'I won! 🤖';
+      gameActive = false;
+      return;
+    }
+    
+    if (!board.includes('')) {
+      document.getElementById('tictactoeStatus').innerHTML = "It's a draw! 🤝<button class='rps-btn' style='margin-top: 0.5rem;' onclick='location.reload()'>Play Again</button>";
+      gameActive = false;
+      return;
+    }
+    
+    document.getElementById('tictactoeStatus').textContent = 'My turn...';
+    
+    setTimeout(() => {
+      computerMove();
+      updateBoard();
+      
+      winner = checkWinner();
+      if (winner) {
+        document.getElementById('tictactoeStatus').innerHTML = 'I won! 🤖<button class="rps-btn" style="margin-top: 0.5rem;" onclick="location.reload()">Play Again</button>';
+        gameActive = false;
+        return;
+      }
+      
+      if (!board.includes('')) {
+        document.getElementById('tictactoeStatus').innerHTML = "It's a draw! 🤝<button class='rps-btn' style='margin-top: 0.5rem;' onclick='location.reload()'>Play Again</button>";
+        gameActive = false;
+        return;
+      }
+      
+      document.getElementById('tictactoeStatus').textContent = 'Your turn (X)';
+    }, 500);
+  };
+}
+
+// ========== COLOR CLICKER ==========
+function initColorClicker(container) {
+  const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+  let score = 0;
+  let timeLeft = 30;
+  let gameActive = true;
+  let gameStarted = false;
+  
+  function pickColor() {
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+  
+  function startGame() {
+    gameStarted = true;
+    const startBtn = document.querySelector('.colorclicker-startbtn');
+    if (startBtn) startBtn.style.display = 'none';
+    
+    const countdown = setInterval(() => {
+      timeLeft--;
+      document.getElementById('timeLeft').textContent = timeLeft;
+      
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        gameActive = false;
+        document.getElementById('colorclickerDisplay').innerHTML = 
+          `Game Over! Final Score: ${score}<br><button class="rps-btn" style="margin-top: 1rem;" onclick="location.reload()">Play Again</button>`;
+        document.querySelector('.colorclicker-grid').innerHTML = '';
+      }
+    }, 1000);
+    
+    updateColorButtons();
+  }
+  
+  function updateColorButtons() {
+    if (!gameActive) return;
+    
+    const targetColor = pickColor();
+    const grid = document.querySelector('.colorclicker-grid');
+    grid.innerHTML = '';
+    
+    colors.forEach(color => {
+      const btn = document.createElement('button');
+      btn.className = 'colorclicker-btn';
+      btn.style.backgroundColor = color;
+      
+      if (color === targetColor) {
+        btn.onclick = () => {
+          if (gameActive) {
+            score++;
+            document.getElementById('score').textContent = score;
+            updateColorButtons();
+          }
+        };
+      } else {
+        btn.onclick = () => {
+          if (gameActive) {
+            gameActive = false;
+            document.getElementById('colorclickerDisplay').innerHTML = 
+              `Wrong color! Final Score: ${score}<br><button class="rps-btn" style="margin-top: 1rem;" onclick="location.reload()">Play Again</button>`;
+            grid.innerHTML = '';
+          }
+        };
+      }
+      
+      grid.appendChild(btn);
+    });
+  }
+  
+  container.innerHTML = `
+    <h2 class="game-title">🌈 Color Clicker</h2>
+    <p class="game-description">Click the correct color as fast as you can!</p>
+    <div class="colorclicker-container">
+      <div id="colorclickerDisplay" class="colorclicker-display">
+        <button class="rps-btn colorclicker-startbtn" onclick="startGame()">Start Game</button>
+      </div>
+      <div class="colorclicker-grid" id="colorclickerGrid"></div>
+      <div class="colorclicker-stats">
+        Score: <span id="score">0</span> | Time: <span id="timeLeft">30</span>s
+      </div>
+    </div>
+  `;
+  
+  window.startGame = startGame;
+}
+
+// ========== WORD SCRAMBLE ==========
+function initWordScramble(container) {
+  const words = [
+    { word: 'javascript', hint: 'Programming language' },
+    { word: 'computer', hint: 'Electronic device' },
+    { word: 'website', hint: 'Online page' },
+    { word: 'function', hint: 'Code block' },
+    { word: 'variable', hint: 'Data container' },
+    { word: 'element', hint: 'HTML component' },
+    { word: 'button', hint: 'Clickable UI item' },
+    { word: 'developer', hint: 'Code writer' },
+    { word: 'design', hint: 'Visual layout' },
+    { word: 'application', hint: 'Software program' }
+  ];
+  
+  let currentWordObj = words[Math.floor(Math.random() * words.length)];
+  let scrambled = currentWordObj.word.split('').sort(() => Math.random() - 0.5).join('');
+  let attempts = 0;
+  
+  container.innerHTML = `
+    <h2 class="game-title">📝 Word Scramble</h2>
+    <p class="game-description">Unscramble the letters to find the word</p>
+    <div class="wordscramble-container">
+      <div class="wordscramble-word" id="scrambledWord">${scrambled}</div>
+      <input type="text" class="wordscramble-input" id="wordscrambleInput" placeholder="Enter your answer">
+      <button class="wordscramble-btn" onclick="submitWord()">Submit</button>
+      <div id="wordscrambleFeedback" class="wordscramble-feedback">Good luck!</div>
+      <div class="wordscramble-hint">Hint: ${currentWordObj.hint}</div>
+    </div>
+  `;
+  
+  window.submitWord = function() {
+    const input = document.getElementById('wordscrambleInput');
+    const guess = input.value.toLowerCase();
+    attempts++;
+    
+    if (guess === currentWordObj.word) {
+      document.getElementById('wordscrambleFeedback').innerHTML = 
+        `🎉 Correct! The word was "${currentWordObj.word}"<br>You got it in ${attempts} ${attempts === 1 ? 'attempt' : 'attempts'}!<br><button class="wordscramble-btn" style="margin-top: 1rem;" onclick="location.reload()">Next Word</button>`;
+      input.disabled = true;
+    } else {
+      document.getElementById('wordscrambleFeedback').innerHTML = 
+        `❌ That's not correct. Try again! (Attempt ${attempts})`;
+    }
+    
+    input.value = '';
+  };
+  
+  document.getElementById('wordscrambleInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') submitWord();
+  });
+  
+  document.getElementById('wordscrambleInput').focus();
+}
