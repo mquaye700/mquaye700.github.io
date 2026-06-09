@@ -679,35 +679,61 @@ function initWordScramble(container) {
       return;
     }
 
-    const viewMap = L.map('viewMap', { zoomControl: true }).setView([20, 0], 2);
+    const streetViewImage = document.getElementById('streetViewImage');
+    const guessMap = L.map('guessMap').setView([20, 0], 2);
     const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     const osmOpts = { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors', errorTileUrl: '' };
-    const viewTiles = L.tileLayer(osmUrl, osmOpts).addTo(viewMap);
-
-    const guessMap = L.map('guessMap').setView([20, 0], 2);
     const guessTiles = L.tileLayer(osmUrl, osmOpts).addTo(guessMap);
 
-    // show overlay message if tiles fail to load
-    function attachTileError(map, containerId) {
-      map.on('tileerror', () => {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        let overlay = container.querySelector('.map-error');
-        if (!overlay) {
-          overlay = document.createElement('div');
-          overlay.className = 'map-error';
-          overlay.textContent = 'Map data not available — try reloading or serving the site over HTTP.';
-          container.style.position = 'relative';
-          container.appendChild(overlay);
-        }
-      });
+    // ensure leaflet redraws correctly inside responsive layout
+    setTimeout(() => { try { guessMap.invalidateSize(); } catch (e) {} }, 300);
+
+    const streetViewLocations = [
+      { label: 'New York, USA', coords: [40.748817, -73.985428] },
+      { label: 'London, UK', coords: [51.507351, -0.127758] },
+      { label: 'Tokyo, Japan', coords: [35.689487, 139.691711] },
+      { label: 'Cape Town, South Africa', coords: [-33.924870, 18.424055] },
+      { label: 'Accra, Ghana', coords: [5.603717, -0.186964] },
+      { label: 'Paris, France', coords: [48.856613, 2.352222] },
+      { label: 'Rio de Janeiro, Brazil', coords: [-22.906847, -43.172897] },
+      { label: 'Sydney, Australia', coords: [-33.868820, 151.209290] },
+      { label: 'Cairo, Egypt', coords: [30.044420, 31.235712] },
+      { label: 'Mumbai, India', coords: [19.075983, 72.877655] },
+      { label: 'Toronto, Canada', coords: [43.653225, -79.383186] },
+      { label: 'Seoul, South Korea', coords: [37.566536, 126.977966] },
+      { label: 'Mexico City, Mexico', coords: [19.432608, -99.133209] },
+      { label: 'Dubai, UAE', coords: [25.204849, 55.270783] },
+      { label: 'Berlin, Germany', coords: [52.520008, 13.404954] },
+      { label: 'Nairobi, Kenya', coords: [-1.292066, 36.821945] },
+      { label: 'Bangkok, Thailand', coords: [13.756331, 100.501762] },
+      { label: 'Buenos Aires, Argentina', coords: [-34.603722, -58.381592] },
+      { label: 'Istanbul, Turkey', coords: [41.008238, 28.978359] },
+      { label: 'Madrid, Spain', coords: [40.416775, -3.703790] }
+    ];
+    let lastStreetIndex = null;
+
+    function getRandomStreetLocation() {
+      if (!streetViewLocations.length) {
+        return [20, 0];
+      }
+      let index = Math.floor(Math.random() * streetViewLocations.length);
+      if (index === lastStreetIndex) {
+        index = (index + 1) % streetViewLocations.length;
+      }
+      lastStreetIndex = index;
+      return streetViewLocations[index];
     }
 
-    attachTileError(viewMap, 'viewMap');
-    attachTileError(guessMap, 'guessMap');
-
-    // ensure leaflet redraws correctly inside responsive layout
-    setTimeout(() => { try { viewMap.invalidateSize(); guessMap.invalidateSize(); } catch (e) {} }, 300);
+    function updateStreetViewImage(latlng) {
+      if (!streetViewImage) return;
+      const heading = Math.floor(Math.random() * 360);
+      const apiUrl = `https://maps.googleapis.com/maps/api/streetview?size=640x420&location=${latlng[0]},${latlng[1]}&heading=${heading}&pitch=0`;
+      streetViewImage.src = apiUrl;
+      streetViewImage.alt = `Google Street View at ${latlng[0].toFixed(4)}, ${latlng[1].toFixed(4)}`;
+      streetViewImage.onerror = () => {
+        streetViewImage.alt = 'Street View image could not load. Serve the page over HTTP or add a Google API key for Street View images.';
+      };
+    }
 
   let trueLatLng = null;
   let trueMarker = null;
@@ -731,15 +757,14 @@ function initWordScramble(container) {
   }
 
   function clearRoundLayers() {
-    if (trueMarker) { viewMap.removeLayer(trueMarker); trueMarker = null; }
+    if (trueMarker) { guessMap.removeLayer(trueMarker); trueMarker = null; }
     if (guessMarker) { guessMap.removeLayer(guessMarker); guessMarker = null; }
     if (connector) { guessMap.removeLayer(connector); connector = null; }
   }
 
   function randomLatLng() {
-    const lat = (Math.random() * 140) - 70; // avoid extreme poles
-    const lng = (Math.random() * 360) - 180;
-    return [lat, lng];
+    const location = getRandomStreetLocation();
+    return location.coords;
   }
 
   function startNewRound() {
@@ -747,14 +772,11 @@ function initWordScramble(container) {
     round += 1;
     roundEl.textContent = round;
     guessing = false;
-    // pick a random location and center the view map to give the player context
-    trueLatLng = randomLatLng();
-    viewMap.setView(trueLatLng, 16);
-    // small marker hidden until answer shown
-    trueMarker = L.marker(trueLatLng, { opacity: 0 });
-    trueMarker.addTo(viewMap);
+    const location = getRandomStreetLocation();
+    trueLatLng = location.coords;
+    updateStreetViewImage(trueLatLng);
+    try { guessMap.setView([20, 0], 2); } catch (e) {}
   }
-
     makeBtn.addEventListener('click', () => {
     guessing = true;
     alert('Guess mode active: click the right-hand map to place your guess.');
@@ -782,9 +804,8 @@ function initWordScramble(container) {
 
     showAnswerBtn.addEventListener('click', () => {
     if (!trueLatLng) return;
-    // reveal true marker on both maps
-    if (trueMarker) { viewMap.removeLayer(trueMarker); }
-    trueMarker = L.marker(trueLatLng, { title: 'Answer' }).addTo(viewMap).bindPopup('Answer').openPopup();
+    if (trueMarker) { guessMap.removeLayer(trueMarker); }
+    trueMarker = L.marker(trueLatLng, { title: 'Answer' }).addTo(guessMap).bindPopup('Answer').openPopup();
 
     if (connector) guessMap.fitBounds(connector.getBounds().pad(0.3));
     else guessMap.setView(trueLatLng, 3);
@@ -800,7 +821,7 @@ function initWordScramble(container) {
     scoreEl.textContent = totalScore;
     roundEl.textContent = round;
     clearRoundLayers();
-      try { viewMap.setView([20,0],2); guessMap.setView([20,0],2); } catch (e) {}
+      try { guessMap.setView([20,0],2); } catch (e) {}
   });
 
   // Start first round
