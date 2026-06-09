@@ -680,10 +680,31 @@ function initWordScramble(container) {
     }
 
     const viewMap = L.map('viewMap', { zoomControl: true }).setView([20, 0], 2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(viewMap);
+    const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const osmOpts = { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors', errorTileUrl: '' };
+    const viewTiles = L.tileLayer(osmUrl, osmOpts).addTo(viewMap);
 
     const guessMap = L.map('guessMap').setView([20, 0], 2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(guessMap);
+    const guessTiles = L.tileLayer(osmUrl, osmOpts).addTo(guessMap);
+
+    // show overlay message if tiles fail to load
+    function attachTileError(map, containerId) {
+      map.on('tileerror', () => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        let overlay = container.querySelector('.map-error');
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.className = 'map-error';
+          overlay.textContent = 'Map data not available — try reloading or serving the site over HTTP.';
+          container.style.position = 'relative';
+          container.appendChild(overlay);
+        }
+      });
+    }
+
+    attachTileError(viewMap, 'viewMap');
+    attachTileError(guessMap, 'guessMap');
 
     // ensure leaflet redraws correctly inside responsive layout
     setTimeout(() => { try { viewMap.invalidateSize(); guessMap.invalidateSize(); } catch (e) {} }, 300);
