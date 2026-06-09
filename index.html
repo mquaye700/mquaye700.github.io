@@ -9,18 +9,42 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
-  </head>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <title>GeoGuess-like Game</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
   <body>
-    <header class="site-header">
-      <div class="container header-inner">
-        <a class="brand" href="#home">mquaye700</a>
-        <button class="nav-toggle" aria-label="Toggle navigation" aria-controls="main-navigation" aria-expanded="false">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-        <nav id="main-navigation" class="site-nav closed">
-          <a href="#about">About</a>
+    <header>
+      <h1>GeoGuess-like Game</h1>
+      <p>A simplified map-guessing game — click "Make Guess" then click the right map to place your guess.</p>
+    </header>
+
+    <main id="game">
+      <div id="left">
+        <div id="viewMap" class="map"></div>
+        <div class="controls">
+          <button id="makeGuessBtn">Make Guess</button>
+          <button id="showAnswerBtn">Show Answer</button>
+          <button id="nextBtn">Next Round</button>
+          <button id="resetBtn">Reset</button>
+          <div id="info">Round: <span id="round">0</span> • Score: <span id="score">0</span></div>
+        </div>
+      </div>
+
+      <div id="right">
+        <div id="guessMap" class="map"></div>
+        <div class="hint">Click the world map to place your guess when in "Make Guess" mode.</div>
+      </div>
+    </main>
+
+  </body>
+  </html>
           <a href="#expertise">Expertise</a>
           <a href="#projects">Projects</a>
           <a href="#experience">Experience</a>

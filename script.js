@@ -643,3 +643,119 @@ function initWordScramble(container) {
   
   document.getElementById('wordscrambleInput').focus();
 }
+
+// ========== GEOGUESS-LIKE GAME ==========
+(function() {
+  const makeBtn = document.getElementById('makeGuessBtn');
+  if (!makeBtn) return; // page doesn't include the game UI
+
+  const showAnswerBtn = document.getElementById('showAnswerBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const roundEl = document.getElementById('round');
+  const scoreEl = document.getElementById('score');
+
+  const viewMap = L.map('viewMap', { zoomControl: true }).setView([20, 0], 2);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(viewMap);
+
+  const guessMap = L.map('guessMap').setView([20, 0], 2);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(guessMap);
+
+  let trueLatLng = null;
+  let trueMarker = null;
+  let guessMarker = null;
+  let connector = null;
+  let guessing = false;
+  let round = 0;
+  let totalScore = 0;
+
+  function toRadians(deg) { return deg * Math.PI / 180; }
+  function haversine(a, b) {
+    const lat1 = toRadians(a[0]);
+    const lon1 = toRadians(a[1]);
+    const lat2 = toRadians(b[0]);
+    const lon2 = toRadians(b[1]);
+    const dLat = lat2 - lat1;
+    const dLon = lon2 - lon1;
+    const R = 6371; // km
+    const h = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+
+  function clearRoundLayers() {
+    if (trueMarker) { viewMap.removeLayer(trueMarker); trueMarker = null; }
+    if (guessMarker) { guessMap.removeLayer(guessMarker); guessMarker = null; }
+    if (connector) { guessMap.removeLayer(connector); connector = null; }
+  }
+
+  function randomLatLng() {
+    const lat = (Math.random() * 140) - 70; // avoid extreme poles
+    const lng = (Math.random() * 360) - 180;
+    return [lat, lng];
+  }
+
+  function startNewRound() {
+    clearRoundLayers();
+    round += 1;
+    roundEl.textContent = round;
+    guessing = false;
+    // pick a random location and center the view map to give the player context
+    trueLatLng = randomLatLng();
+    viewMap.setView(trueLatLng, 16);
+    // small marker hidden until answer shown
+    trueMarker = L.marker(trueLatLng, { opacity: 0 });
+    trueMarker.addTo(viewMap);
+  }
+
+  makeBtn.addEventListener('click', () => {
+    guessing = true;
+    alert('Guess mode active: click the right-hand map to place your guess.');
+  });
+
+  guessMap.on('click', function(e) {
+    if (!guessing) return;
+    const latlng = [e.latlng.lat, e.latlng.lng];
+
+    if (guessMarker) guessMap.removeLayer(guessMarker);
+    guessMarker = L.marker(latlng).addTo(guessMap);
+
+    const dist = haversine(trueLatLng, latlng); // km
+    // scoring: closer = more points (arbitrary scale)
+    const points = Math.max(0, Math.round(5000 - dist * 20));
+    totalScore += points;
+    scoreEl.textContent = totalScore;
+    guessing = false;
+
+    // show connector and popup
+    if (connector) guessMap.removeLayer(connector);
+    connector = L.polyline([latlng, trueLatLng], { color: 'red' }).addTo(guessMap);
+    guessMarker.bindPopup(`Distance: ${dist.toFixed(1)} km<br>Points: ${points}`).openPopup();
+  });
+
+  showAnswerBtn.addEventListener('click', () => {
+    if (!trueLatLng) return;
+    // reveal true marker on both maps
+    if (trueMarker) { viewMap.removeLayer(trueMarker); }
+    trueMarker = L.marker(trueLatLng, { title: 'Answer' }).addTo(viewMap).bindPopup('Answer').openPopup();
+
+    if (connector) guessMap.fitBounds(connector.getBounds().pad(0.3));
+    else guessMap.setView(trueLatLng, 3);
+  });
+
+  nextBtn.addEventListener('click', () => {
+    startNewRound();
+  });
+
+  resetBtn.addEventListener('click', () => {
+    totalScore = 0;
+    round = 0;
+    scoreEl.textContent = totalScore;
+    roundEl.textContent = round;
+    clearRoundLayers();
+    viewMap.setView([20,0],2);
+    guessMap.setView([20,0],2);
+  });
+
+  // Start first round
+  startNewRound();
+})();
