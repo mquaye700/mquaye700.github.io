@@ -131,6 +131,10 @@ svg {
     backdrop-filter: blur(6px);
   }
 
+  .street-view-panel.street-view-error {
+    border-color: #d45f37;
+  }
+
   .controls { margin-top: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
   .controls button {

@@ -678,8 +678,10 @@ function initWordScramble(container) {
       return;
     }
 
+    const googleStreetViewKey = ''; // Add your Google Street View API key here
     const streetViewImage = document.getElementById('streetViewImage');
     const streetViewLabel = document.getElementById('streetViewLabel');
+    const streetViewPanel = document.getElementById('streetViewPanel');
     const guessMap = L.map('guessMap').setView([20, 0], 2);
     const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     const osmOpts = { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors', errorTileUrl: '' };
@@ -725,15 +727,18 @@ function initWordScramble(container) {
     }
 
     function updateStreetViewImage(location) {
-      if (!streetViewImage || !streetViewLabel) return;
+      if (!streetViewImage || !streetViewLabel || !streetViewPanel) return;
       const heading = Math.floor(Math.random() * 360);
-      const apiUrl = `https://maps.googleapis.com/maps/api/streetview?size=640x420&location=${location.coords[0]},${location.coords[1]}&heading=${heading}&pitch=0`;
+      const baseUrl = `https://maps.googleapis.com/maps/api/streetview?size=640x420&location=${location.coords[0]},${location.coords[1]}&heading=${heading}&pitch=0`;
+      const apiUrl = googleStreetViewKey ? `${baseUrl}&key=${googleStreetViewKey}` : baseUrl;
       streetViewImage.src = apiUrl;
       streetViewImage.alt = `Google Street View at ${location.label}`;
-      streetViewLabel.textContent = `${location.label}`;
+      streetViewLabel.textContent = `${location.label}${googleStreetViewKey ? '' : ' (API key required)'}`;
+      streetViewPanel.classList.remove('street-view-error');
       streetViewImage.onerror = () => {
-        streetViewImage.alt = 'Street View image could not load. Serve the page over HTTP or add a Google API key for Street View images.';
+        streetViewImage.alt = 'Street View image could not load. Add a Google API key or serve the site over HTTP.';
         streetViewLabel.textContent = 'Street View image unavailable';
+        streetViewPanel.classList.add('street-view-error');
       };
     }
 
