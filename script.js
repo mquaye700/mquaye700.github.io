@@ -659,20 +659,34 @@ function initWordScramble(container) {
 
 // ========== GEOGUESS-LIKE GAME ==========
 (function() {
-  const makeBtn = document.getElementById('makeGuessBtn');
-  if (!makeBtn) return; // page doesn't include the game UI
+  // initialize game maps after DOM is ready to ensure containers have size
+  document.addEventListener('DOMContentLoaded', () => {
+    const makeBtn = document.getElementById('makeGuessBtn');
+    if (!makeBtn) return; // page doesn't include the game UI
 
-  const showAnswerBtn = document.getElementById('showAnswerBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  const roundEl = document.getElementById('round');
-  const scoreEl = document.getElementById('score');
+    const showAnswerBtn = document.getElementById('showAnswerBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const roundEl = document.getElementById('round');
+    const scoreEl = document.getElementById('score');
 
-  const viewMap = L.map('viewMap', { zoomControl: true }).setView([20, 0], 2);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(viewMap);
+    if (typeof L === 'undefined') {
+      // Leaflet not loaded or blocked — show simple fallbacks
+      const view = document.getElementById('viewMap');
+      const guess = document.getElementById('guessMap');
+      if (view) view.innerHTML = '<div style="padding:1rem;color:#222;">Map library failed to load.</div>';
+      if (guess) guess.innerHTML = '<div style="padding:1rem;color:#222;">Map library failed to load.</div>';
+      return;
+    }
 
-  const guessMap = L.map('guessMap').setView([20, 0], 2);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(guessMap);
+    const viewMap = L.map('viewMap', { zoomControl: true }).setView([20, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(viewMap);
+
+    const guessMap = L.map('guessMap').setView([20, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(guessMap);
+
+    // ensure leaflet redraws correctly inside responsive layout
+    setTimeout(() => { try { viewMap.invalidateSize(); guessMap.invalidateSize(); } catch (e) {} }, 300);
 
   let trueLatLng = null;
   let trueMarker = null;
@@ -720,12 +734,12 @@ function initWordScramble(container) {
     trueMarker.addTo(viewMap);
   }
 
-  makeBtn.addEventListener('click', () => {
+    makeBtn.addEventListener('click', () => {
     guessing = true;
     alert('Guess mode active: click the right-hand map to place your guess.');
   });
 
-  guessMap.on('click', function(e) {
+    guessMap.on('click', function(e) {
     if (!guessing) return;
     const latlng = [e.latlng.lat, e.latlng.lng];
 
@@ -745,7 +759,7 @@ function initWordScramble(container) {
     guessMarker.bindPopup(`Distance: ${dist.toFixed(1)} km<br>Points: ${points}`).openPopup();
   });
 
-  showAnswerBtn.addEventListener('click', () => {
+    showAnswerBtn.addEventListener('click', () => {
     if (!trueLatLng) return;
     // reveal true marker on both maps
     if (trueMarker) { viewMap.removeLayer(trueMarker); }
@@ -755,20 +769,20 @@ function initWordScramble(container) {
     else guessMap.setView(trueLatLng, 3);
   });
 
-  nextBtn.addEventListener('click', () => {
+    nextBtn.addEventListener('click', () => {
     startNewRound();
   });
 
-  resetBtn.addEventListener('click', () => {
+    resetBtn.addEventListener('click', () => {
     totalScore = 0;
     round = 0;
     scoreEl.textContent = totalScore;
     roundEl.textContent = round;
     clearRoundLayers();
-    viewMap.setView([20,0],2);
-    guessMap.setView([20,0],2);
+      try { viewMap.setView([20,0],2); guessMap.setView([20,0],2); } catch (e) {}
   });
 
   // Start first round
   startNewRound();
+  });
 })();
