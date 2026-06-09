@@ -671,15 +671,15 @@ function initWordScramble(container) {
     const scoreEl = document.getElementById('score');
 
     if (typeof L === 'undefined') {
-      // Leaflet not loaded or blocked — show simple fallbacks
-      const view = document.getElementById('viewMap');
-      const guess = document.getElementById('guessMap');
-      if (view) view.innerHTML = '<div style="padding:1rem;color:#222;">Map library failed to load.</div>';
-      if (guess) guess.innerHTML = '<div style="padding:1rem;color:#222;">Map library failed to load.</div>';
+      const streetViewImage = document.getElementById('streetViewImage');
+      if (streetViewImage) {
+        streetViewImage.alt = 'Street View image cannot load because the map library is unavailable.';
+      }
       return;
     }
 
     const streetViewImage = document.getElementById('streetViewImage');
+    const streetViewLabel = document.getElementById('streetViewLabel');
     const guessMap = L.map('guessMap').setView([20, 0], 2);
     const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     const osmOpts = { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors', errorTileUrl: '' };
@@ -724,14 +724,16 @@ function initWordScramble(container) {
       return streetViewLocations[index];
     }
 
-    function updateStreetViewImage(latlng) {
-      if (!streetViewImage) return;
+    function updateStreetViewImage(location) {
+      if (!streetViewImage || !streetViewLabel) return;
       const heading = Math.floor(Math.random() * 360);
-      const apiUrl = `https://maps.googleapis.com/maps/api/streetview?size=640x420&location=${latlng[0]},${latlng[1]}&heading=${heading}&pitch=0`;
+      const apiUrl = `https://maps.googleapis.com/maps/api/streetview?size=640x420&location=${location.coords[0]},${location.coords[1]}&heading=${heading}&pitch=0`;
       streetViewImage.src = apiUrl;
-      streetViewImage.alt = `Google Street View at ${latlng[0].toFixed(4)}, ${latlng[1].toFixed(4)}`;
+      streetViewImage.alt = `Google Street View at ${location.label}`;
+      streetViewLabel.textContent = `${location.label}`;
       streetViewImage.onerror = () => {
         streetViewImage.alt = 'Street View image could not load. Serve the page over HTTP or add a Google API key for Street View images.';
+        streetViewLabel.textContent = 'Street View image unavailable';
       };
     }
 
@@ -762,11 +764,6 @@ function initWordScramble(container) {
     if (connector) { guessMap.removeLayer(connector); connector = null; }
   }
 
-  function randomLatLng() {
-    const location = getRandomStreetLocation();
-    return location.coords;
-  }
-
   function startNewRound() {
     clearRoundLayers();
     round += 1;
@@ -774,7 +771,7 @@ function initWordScramble(container) {
     guessing = false;
     const location = getRandomStreetLocation();
     trueLatLng = location.coords;
-    updateStreetViewImage(trueLatLng);
+    updateStreetViewImage(location);
     try { guessMap.setView([20, 0], 2); } catch (e) {}
   }
     makeBtn.addEventListener('click', () => {
