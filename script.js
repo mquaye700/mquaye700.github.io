@@ -678,7 +678,7 @@ function initWordScramble(container) {
       return;
     }
 
-    const googleStreetViewKey = ''; // Add your Google Street View API key here if you want guaranteed Street View images
+    const googleStreetViewKey = ''; // Optional: add a Google Street View API key for true Street View imagery
     const streetViewImage = document.getElementById('streetViewImage');
     const streetViewLabel = document.getElementById('streetViewLabel');
     const streetViewPanel = document.getElementById('streetViewPanel');
@@ -726,24 +726,41 @@ function initWordScramble(container) {
       return streetViewLocations[index];
     }
 
+    function streetImageFallback(location) {
+      const query = encodeURIComponent(`${location.label} street`);
+      return `https://source.unsplash.com/640x420/?${query}`;
+    }
+
     function updateStreetViewImage(location) {
       if (!streetViewImage || !streetViewLabel || !streetViewPanel) return;
       const heading = Math.floor(Math.random() * 360);
       const baseUrl = `https://maps.googleapis.com/maps/api/streetview?size=640x420&location=${location.coords[0]},${location.coords[1]}&heading=${heading}&pitch=0`;
-      const streetFallback = `https://source.unsplash.com/640x420/?street,city`; 
-      const apiUrl = googleStreetViewKey ? `${baseUrl}&key=${googleStreetViewKey}` : baseUrl;
+      const apiUrl = googleStreetViewKey ? `${baseUrl}&key=${googleStreetViewKey}` : null;
+
       streetViewImage.onload = () => {
         streetViewPanel.classList.remove('street-view-error');
       };
       streetViewImage.onerror = () => {
         streetViewImage.onerror = null;
-        streetViewImage.src = streetFallback;
-        streetViewLabel.textContent = `${location.label} (real street photo)`;
+        const fallbackUrl = streetImageFallback(location);
+        streetViewImage.src = fallbackUrl;
+        streetViewImage.alt = `Street photo near ${location.label}`;
+        streetViewLabel.textContent = `${location.label} (street photo)`;
         streetViewPanel.classList.add('street-view-error');
       };
-      streetViewImage.src = apiUrl;
-      streetViewImage.alt = `Google Street View at ${location.label}`;
-      streetViewLabel.textContent = `${location.label}`;
+
+      if (apiUrl) {
+        streetViewImage.src = apiUrl;
+        streetViewImage.alt = `Google Street View at ${location.label}`;
+        streetViewLabel.textContent = `${location.label}`;
+      } else {
+        streetViewImage.onerror = null;
+        const fallbackUrl = streetImageFallback(location);
+        streetViewImage.src = fallbackUrl;
+        streetViewImage.alt = `Street photo near ${location.label}`;
+        streetViewLabel.textContent = `${location.label} (street photo)`;
+        streetViewPanel.classList.remove('street-view-error');
+      }
     }
 
   let trueLatLng = null;
