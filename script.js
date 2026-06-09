@@ -3,6 +3,7 @@ const toggle = document.querySelector('.nav-toggle');
 const navLinks = document.querySelectorAll('.site-nav a');
 
 function toggleNav() {
+  if (!toggle || !nav) return;
   const expanded = toggle.getAttribute('aria-expanded') === 'true';
   toggle.setAttribute('aria-expanded', String(!expanded));
   nav.classList.toggle('closed');
@@ -12,20 +13,24 @@ if (toggle && nav) {
   toggle.addEventListener('click', toggleNav);
 }
 
-navLinks.forEach((link) => {
-  link.addEventListener('click', () => {
-    if (window.innerWidth <= 720 && !nav.classList.contains('closed')) {
-      toggleNav();
+if (navLinks && navLinks.length) {
+  navLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 720 && nav && !nav.classList.contains('closed')) {
+        toggleNav();
+      }
+    });
+  });
+}
+
+if (nav && toggle) {
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 720 && nav.classList.contains('closed')) {
+      nav.classList.remove('closed');
+      toggle.setAttribute('aria-expanded', 'false');
     }
   });
-});
-
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 720 && nav.classList.contains('closed')) {
-    nav.classList.remove('closed');
-    toggle.setAttribute('aria-expanded', 'false');
-  }
-});
+}
 
 const revealItems = document.querySelectorAll('[data-reveal]');
 
@@ -49,13 +54,14 @@ if ('IntersectionObserver' in window) {
 
 // ========== CHATBOT FUNCTIONALITY ==========
 
-const chatbotToggle = document.getElementById('chatbotToggle');
-const chatbotClose = document.getElementById('chatbotClose');
-const chatbotPanel = document.getElementById('chatbotPanel');
-const chatbotInput = document.getElementById('chatbotInput');
-const chatbotSend = document.getElementById('chatbotSend');
-const chatbotMessages = document.getElementById('chatbotMessages');
-const chatbotSuggestions = document.getElementById('chatbotSuggestions');
+// Only initialize chatbot behavior if the expected DOM elements exist
+const _chatbotToggle = document.getElementById('chatbotToggle');
+const _chatbotClose = document.getElementById('chatbotClose');
+const _chatbotPanel = document.getElementById('chatbotPanel');
+const _chatbotInput = document.getElementById('chatbotInput');
+const _chatbotSend = document.getElementById('chatbotSend');
+const _chatbotMessages = document.getElementById('chatbotMessages');
+const _chatbotSuggestions = document.getElementById('chatbotSuggestions');
 
 // Chatbot responses
 const responses = {
@@ -86,20 +92,22 @@ const responses = {
 };
 
 function toggleChatbot() {
-  chatbotPanel.classList.toggle('active');
-  if (chatbotPanel.classList.contains('active')) {
-    chatbotInput.focus();
+  if (!_chatbotPanel) return;
+  _chatbotPanel.classList.toggle('active');
+  if (_chatbotPanel.classList.contains('active')) {
+    _chatbotInput && _chatbotInput.focus();
   }
 }
 
 function addMessage(text, isUser = false) {
+  if (!_chatbotMessages) return;
   const messageEl = document.createElement('div');
   messageEl.className = isUser ? 'message user-message' : 'message bot-message';
   const p = document.createElement('p');
   p.textContent = text;
   messageEl.appendChild(p);
-  chatbotMessages.appendChild(messageEl);
-  chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+  _chatbotMessages.appendChild(messageEl);
+  _chatbotMessages.scrollTop = _chatbotMessages.scrollHeight;
 }
 
 function getBotResponse(userMessage) {
@@ -140,17 +148,18 @@ function getBotResponse(userMessage) {
 }
 
 function sendMessage(message = null) {
-  const text = message || chatbotInput.value.trim();
+  if (!_chatbotInput) return;
+  const text = message || _chatbotInput.value.trim();
   
   if (!text) return;
   
   // Add user message
   addMessage(text, true);
-  chatbotInput.value = '';
+  _chatbotInput.value = '';
   
   // Hide suggestions after first message
-  if (chatbotSuggestions.style.display !== 'none') {
-    chatbotSuggestions.style.display = 'none';
+  if (_chatbotSuggestions && _chatbotSuggestions.style.display !== 'none') {
+    _chatbotSuggestions.style.display = 'none';
   }
   
   // Simulate bot typing delay
@@ -160,24 +169,28 @@ function sendMessage(message = null) {
   }, 500);
 }
 
-// Event listeners
-chatbotToggle.addEventListener('click', toggleChatbot);
-chatbotClose.addEventListener('click', toggleChatbot);
-chatbotSend.addEventListener('click', () => sendMessage());
+// Attach chatbot event listeners only if elements exist
+if (_chatbotToggle && _chatbotClose && _chatbotSend && _chatbotInput) {
+  _chatbotToggle.addEventListener('click', toggleChatbot);
+  _chatbotClose.addEventListener('click', toggleChatbot);
+  _chatbotSend.addEventListener('click', () => sendMessage());
 
-chatbotInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    sendMessage();
-  }
-});
+  _chatbotInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      sendMessage();
+    }
+  });
 
-// Close chatbot when clicking outside
-document.addEventListener('click', (e) => {
-  const widget = document.getElementById('chatbotWidget');
-  if (!widget.contains(e.target) && chatbotPanel.classList.contains('active')) {
-    toggleChatbot();
-  }
-});
+  // Close chatbot when clicking outside if widget exists
+  document.addEventListener('click', (e) => {
+    const widget = document.getElementById('chatbotWidget');
+    if (widget && !_chatbotPanel) return;
+    if (widget && !_chatbotPanel.classList.contains('active')) return;
+    if (widget && !widget.contains(e.target) && _chatbotPanel && _chatbotPanel.classList.contains('active')) {
+      toggleChatbot();
+    }
+  });
+}
 
 // ========== GAME FUNCTIONALITY ==========
 
