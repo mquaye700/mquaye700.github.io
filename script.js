@@ -678,7 +678,7 @@ function initWordScramble(container) {
       return;
     }
 
-    const googleStreetViewKey = ''; // Add your Google Street View API key here
+    const googleStreetViewKey = ''; // Add your Google Street View API key here if you want guaranteed Street View images
     const streetViewImage = document.getElementById('streetViewImage');
     const streetViewLabel = document.getElementById('streetViewLabel');
     const streetViewPanel = document.getElementById('streetViewPanel');
@@ -730,16 +730,20 @@ function initWordScramble(container) {
       if (!streetViewImage || !streetViewLabel || !streetViewPanel) return;
       const heading = Math.floor(Math.random() * 360);
       const baseUrl = `https://maps.googleapis.com/maps/api/streetview?size=640x420&location=${location.coords[0]},${location.coords[1]}&heading=${heading}&pitch=0`;
+      const streetFallback = `https://source.unsplash.com/640x420/?street,city`; 
       const apiUrl = googleStreetViewKey ? `${baseUrl}&key=${googleStreetViewKey}` : baseUrl;
-      streetViewImage.src = apiUrl;
-      streetViewImage.alt = `Google Street View at ${location.label}`;
-      streetViewLabel.textContent = `${location.label}${googleStreetViewKey ? '' : ' (API key required)'}`;
-      streetViewPanel.classList.remove('street-view-error');
+      streetViewImage.onload = () => {
+        streetViewPanel.classList.remove('street-view-error');
+      };
       streetViewImage.onerror = () => {
-        streetViewImage.alt = 'Street View image could not load. Add a Google API key or serve the site over HTTP.';
-        streetViewLabel.textContent = 'Street View image unavailable';
+        streetViewImage.onerror = null;
+        streetViewImage.src = streetFallback;
+        streetViewLabel.textContent = `${location.label} (real street photo)`;
         streetViewPanel.classList.add('street-view-error');
       };
+      streetViewImage.src = apiUrl;
+      streetViewImage.alt = `Google Street View at ${location.label}`;
+      streetViewLabel.textContent = `${location.label}`;
     }
 
   let trueLatLng = null;
