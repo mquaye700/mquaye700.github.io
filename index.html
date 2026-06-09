@@ -65,180 +65,51 @@
             <div class="hero-actions">
               <a class="button button-primary" href="#projects">View Work</a>
               <a class="button button-outline" href="#contact">Get in Touch</a>
-            </div>
-            <div class="hero-badges">
-              <span>Frontend development</span>
-              <span>Design systems</span>
-              <span>High-performance sites</span>
-            </div>
-          </div>
+            <!DOCTYPE html>
+            <html lang="en">
+              <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <title>GeoGuess-like Game</title>
+                <meta name="description" content="Simplified GeoGuess-like game" />
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                <link rel="stylesheet" href="styles.css" />
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                <script src="script.js" defer></script>
+              </head>
+              <body>
+                <header>
+                  <nav class="top-nav">
+                    <a href="#expertise">Expertise</a>
+                    <a href="#projects">Projects</a>
+                    <a href="#experience">Experience</a>
+                    <a href="#contact">Contact</a>
+                  </nav>
+                  <h1>GeoGuess-like Game</h1>
+                  <p>A simplified map-guessing game — click "Make Guess" then click the right map to place your guess.</p>
+                </header>
 
-          <aside class="hero-panel" data-reveal>
-            <div class="hero-panel-inner">
-              <p class="panel-label">Next launch</p>
-              <h2>Interactive portfolio refresh</h2>
-              <p>Building a streamlined showcase for modern web projects with a strong focus on accessibility and performance.</p>
-              <div class="panel-stat">
-                <strong>+40%</strong>
-                <span>Improved load times expected</span>
-              </div>
-            </div>
-          </aside>
-        </div>
-      </section>
+                <main id="game">
+                  <div id="left">
+                    <div id="viewMap" class="map"></div>
+                    <div class="controls">
+                      <button id="makeGuessBtn">Make Guess</button>
+                      <button id="showAnswerBtn">Show Answer</button>
+                      <button id="nextBtn">Next Round</button>
+                      <button id="resetBtn">Reset</button>
+                      <div id="info">Round: <span id="round">0</span> • Score: <span id="score">0</span></div>
+                    </div>
+                  </div>
 
-      <section id="about" class="section about-section">
-        <div class="container section-grid">
-          <div class="content-card" data-reveal>
-            <h2>About Me</h2>
-            <p>
-              I combine design thinking with front-end development to build websites that feel effortless and work reliably. My focus is on user clarity, clean interactions, and measurable results.
-            </p>
-            <p>
-              From landing pages to web applications, I enjoy solving problems with elegant interfaces and scalable structure.
-            </p>
-            <div class="about-list">
-              <div>
-                <strong>Based in</strong>
-                <span>Accra, Ghana</span>
-              </div>
-              <div>
-                <strong>Specialty</strong>
-                <span>UX-led web experiences</span>
-              </div>
-              <div>
-                <strong>Availability</strong>
-                <span>Freelance &amp; collaboration</span>
-              </div>
-            </div>
-          </div>
+                  <div id="right">
+                    <div id="guessMap" class="map"></div>
+                    <div class="hint">Click the world map to place your guess when in "Make Guess" mode.</div>
+                  </div>
+                </main>
 
-          <div class="values-card" data-reveal>
-            <h3>Working with me means</h3>
-            <ul>
-              <li>Clear communication and honest timelines</li>
-              <li>Performance-first architecture</li>
-              <li>Accessible interfaces for real users</li>
-              <li>Design systems that grow with your project</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section id="story" class="section story-section">
-        <div class="container">
-          <div class="section-heading" data-reveal>
-            <p class="eyebrow">My business journey</p>
-            <h2>How I grew my business</h2>
-            <p>Every step of my journey was shaped by learning, customer focus, and building something people could rely on.</p>
-          </div>
-          <div class="story-grid">
-            <div class="story-body" data-reveal>
-              <p>
-                Five years ago, I started with a single laptop, a sketchbook, and a clear ambition: to help small brands look professional online without sacrificing authenticity. At first, I took on every job that came my way, from one-page landing sites to local restaurant menus. That work taught me the first lesson of growth: consistency matters more than perfection. Every project gave me a new story, a new lesson, and a new piece of evidence that my approach was working.
-              </p>
-              <p>
-                I built trust the old-fashioned way—through strong communication, open timelines, and by delivering more than expected. My first clients were nervous business owners with tight budgets. When I launched their websites quickly, listened carefully to their needs, and fine-tuned features based on real feedback, they recommended me to other entrepreneurs. Word-of-mouth became the first foundation of growth, and I learned to treat every client relationship as the most important one.
-              </p>
-              <p>
-                As the work became more visible, I shifted from being reactive to thinking strategically. I started creating a clearer brand identity for myself, with a website that reflected the same quality I delivered to clients. I invested time into case studies, polished photography, and messaging that explained how I help businesses grow. That investment made it easier for people to see the value in what I offered, and it attracted better fitting clients.
-              </p>
-              <p>
-                The next major turning point was focusing on systems. I moved beyond ad hoc project work and developed repeatable processes for discovery, design, development, and launch. I created onboarding guides, project check-ins, and milestone reviews. This made the business feel more professional and enabled me to scale without losing control. It also freed up time to refine the business model, build recurring services, and explore new revenue paths.
-              </p>
-              <p>
-                Along the way, I embraced continuous improvement. I tracked what clients asked for most, which industries they were in, and what problems they needed solved. That insight helped me position my services more clearly around high-value areas like brand website design, conversion-focused landing pages, and performance-driven digital experiences. I learned to say no to projects that were outside my sweet spot and to say yes to work that aligned with the business I wanted to build.
-              </p>
-              <p>
-                Today, my business is not just about websites. It is about creating digital spaces where entrepreneurs can feel confident, visible, and ready for growth. The journey has included late nights, hard conversations, and continuous adaptation. It has also included celebrating the moment a client told me their new site helped them book their first major client or the day a small local shop began receiving online orders through a site I built.
-              </p>
-              <p>
-                The story is still unfolding. My focus remains on building honest, lasting relationships, delivering work that people recommend, and using what I learn next to make every new project stronger than the last. That is how I grew my business—and why I still treat every website as the start of a new story.
-              </p>
-            </div>
-            <div class="story-gallery" data-reveal>
-              <img class="story-image" loading="lazy" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=900&fit=crop" alt="Black business team smiling and collaborating around a table" />
-              <img class="story-image" loading="lazy" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&h=900&fit=crop" alt="Black entrepreneur smiling while working on a laptop" />
-              <img class="story-image" loading="lazy" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=900&fit=crop" alt="Black professionals smiling during a meeting" />
-              <img class="story-image" loading="lazy" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=900&h=900&fit=crop" alt="Black designer smiling while reviewing a website design" />
-              <img class="story-image" loading="lazy" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=900&fit=crop" alt="Black business owner smiling while working in a creative space" />
-              <img class="story-image" loading="lazy" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=900&fit=crop" alt="Black team smiling while planning a project together" />
-              <img class="story-image" loading="lazy" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=900&fit=crop" alt="Black founder smiling while presenting ideas" />
-              <img class="story-image" loading="lazy" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=900&fit=crop" alt="Black creative team smiling and celebrating a project" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="gallery" class="section art-gallery-section">
-        <div class="container">
-          <div class="section-heading" data-reveal>
-            <p class="eyebrow">Visual story</p>
-            <h2>Smiles, stories, and African-inspired design</h2>
-            <p>Bright, joyful photos of business owners and teams, paired with modern African art-inspired patterns.</p>
-          </div>
-          <div class="art-gallery-grid" data-reveal>
-            <article class="art-card">
-              <img loading="lazy" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&h=900&fit=crop" alt="Black woman entrepreneur smiling confidently while working" />
-              <div class="art-card-meta">
-                <h3>Smiling entrepreneur</h3>
-                <p>Confident brand owner ready to grow.</p>
-              </div>
-            </article>
-            <article class="art-card">
-              <img loading="lazy" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=900&fit=crop" alt="Black team smiling together in an office" />
-              <div class="art-card-meta">
-                <h3>Team energy</h3>
-                <p>Collaborating with passion and purpose.</p>
-              </div>
-            </article>
-            <article class="art-card">
-              <img loading="lazy" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=900&fit=crop" alt="Black business meeting with smiling participants" />
-              <div class="art-card-meta">
-                <h3>Strong collaboration</h3>
-                <p>Every meeting is a chance to build trust.</p>
-              </div>
-            </article>
-            <article class="art-card">
-              <img loading="lazy" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=900&h=900&fit=crop" alt="Black businesswoman smiling confidently in a professional setting" />
-              <div class="art-card-meta">
-                <h3>Bold leadership</h3>
-                <p>Leading with style and confidence.</p>
-              </div>
-            </article>
-            <article class="art-card">
-              <img loading="lazy" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=900&fit=crop" alt="Black creative team smiling while collaborating on a project" />
-              <div class="art-card-meta">
-                <h3>Creative culture</h3>
-                <p>Design and strategy fueled by joy.</p>
-              </div>
-            </article>
-            <article class="art-card">
-              <img loading="lazy" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=900&fit=crop" alt="Black founder and team smiling after a successful meeting" />
-              <div class="art-card-meta">
-                <h3>Growth mindset</h3>
-                <p>Happy teams make strong brands.</p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="expertise" class="section expertise-section">
-        <div class="container">
-          <div class="section-heading" data-reveal>
-            <p class="eyebrow">What I do best</p>
-            <h2>Core expertise</h2>
-            <p>Front-end solutions built to scale — from accessible websites to polished product experiences.</p>
-          </div>
-          <div class="expertise-grid">
-            <article class="expertise-card" data-reveal>
-              <h3>Front-end engineering</h3>
-              <p>JavaScript, modern CSS, responsive layouts, and semantic HTML for fast, maintainable UIs.</p>
-            </article>
-            <article class="expertise-card" data-reveal>
-              <h3>Design systems</h3>
-              <p>Reusable components, shared patterns, and scalable systems that keep interfaces consistent and easy to update.</p>
+                <footer style="margin-top:24px;color:#666;">Built for testing — anchors above link to site sections.</footer>
+              </body>
+            </html>
             </article>
             <article class="expertise-card" data-reveal>
               <h3>Performance</h3>
