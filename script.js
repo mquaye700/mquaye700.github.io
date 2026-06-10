@@ -681,6 +681,7 @@ function initWordScramble(container) {
     const googleStreetViewKey = ''; // Optional: add a Google Street View API key for true Street View imagery
     const streetViewImage = document.getElementById('streetViewImage');
     const streetViewLabel = document.getElementById('streetViewLabel');
+    const streetViewStatus = document.getElementById('streetViewStatus');
     const streetViewPanel = document.getElementById('streetViewPanel');
     const guessMap = L.map('guessMap').setView([20, 0], 2);
     const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -734,6 +735,7 @@ function initWordScramble(container) {
     function buildStreetViewSources(location) {
       const heading = Math.floor(Math.random() * 360);
       const sources = [];
+      const query = encodeURIComponent(`${location.label} street`);
 
       if (googleStreetViewKey) {
         sources.push({
@@ -743,16 +745,15 @@ function initWordScramble(container) {
         });
       }
 
-      const query = encodeURIComponent(`${location.label} street`);
-      sources.push({
-        url: `https://source.unsplash.com/640x420/?${query}`,
-        label: `Street photo near ${location.label}`,
-        type: 'unsplash'
-      });
-
       sources.push({
         url: `https://images.unsplash.com/photo-1494526585095-c41746248156?w=640&h=420&fit=crop&auto=format&fm=jpg&q=80&sig=${Date.now()}`,
         label: `Street photo fallback image`, 
+        type: 'fallback'
+      });
+
+      sources.push({
+        url: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=640&h=420&fit=crop&auto=format&fm=jpg&q=80&sig=${Date.now()}`,
+        label: `Street photo alternate fallback`, 
         type: 'fallback'
       });
 
@@ -760,12 +761,14 @@ function initWordScramble(container) {
     }
 
     function loadStreetViewSource(location, sources, index = 0) {
-      if (!streetViewImage || !streetViewLabel || !streetViewPanel) return;
+      if (!streetViewImage || !streetViewLabel || !streetViewPanel || !streetViewStatus) return;
       if (index >= sources.length) {
         streetViewImage.src = '';
         streetViewImage.alt = `Street photo could not be loaded for ${location.label}`;
         streetViewLabel.textContent = `Unable to load image`;
+        streetViewStatus.textContent = `No available street image source could be loaded.`;
         streetViewPanel.classList.add('street-view-error');
+        streetViewPanel.classList.remove('street-view-fallback');
         return;
       }
 
@@ -775,7 +778,15 @@ function initWordScramble(container) {
         streetViewImage.src = source.url;
         streetViewImage.alt = source.label;
         streetViewLabel.textContent = source.type === 'google' ? location.label : `${location.label} (street photo)`;
-        streetViewPanel.classList.remove('street-view-error');
+        if (source.type === 'google') {
+          streetViewStatus.textContent = `Google Street View image loaded from ${location.label}.`;
+          streetViewPanel.classList.remove('street-view-fallback');
+          streetViewPanel.classList.remove('street-view-error');
+        } else {
+          streetViewStatus.textContent = `Fallback street photo used because no Google API key is configured.`;
+          streetViewPanel.classList.add('street-view-fallback');
+          streetViewPanel.classList.remove('street-view-error');
+        }
       };
       tester.onerror = () => {
         loadStreetViewSource(location, sources, index + 1);
@@ -784,9 +795,12 @@ function initWordScramble(container) {
     }
 
     function updateStreetViewImage(location) {
-      if (!streetViewImage || !streetViewLabel || !streetViewPanel) return;
+      if (!streetViewImage || !streetViewLabel || !streetViewPanel || !streetViewStatus) return;
       streetViewImage.alt = `Loading street view for ${location.label}...`;
+      streetViewLabel.textContent = `Loading ${location.label}`;
+      streetViewStatus.textContent = googleStreetViewKey ? 'Loading Google Street View...' : 'Loading fallback street photo; add a Google Street View API key for real Street View imagery.';
       streetViewPanel.classList.remove('street-view-error');
+      streetViewPanel.classList.toggle('street-view-fallback', !googleStreetViewKey);
       const sources = buildStreetViewSources(location);
       loadStreetViewSource(location, sources, 0);
     }
