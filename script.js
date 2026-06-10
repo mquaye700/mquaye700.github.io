@@ -683,6 +683,10 @@ function initWordScramble(container) {
     const streetViewLabel = document.getElementById('streetViewLabel');
     const streetViewStatus = document.getElementById('streetViewStatus');
     const streetViewPanel = document.getElementById('streetViewPanel');
+    const streetRotateLeft = document.getElementById('streetRotateLeft');
+    const streetRotateRight = document.getElementById('streetRotateRight');
+    const streetMoveForward = document.getElementById('streetMoveForward');
+    const streetNewView = document.getElementById('streetNewView');
     const guessMap = L.map('guessMap').setView([20, 0], 2);
     const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     const osmOpts = { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors', errorTileUrl: '' };
@@ -714,10 +718,14 @@ function initWordScramble(container) {
       { label: 'Madrid, Spain', coords: [40.416775, -3.703790] }
     ];
     let lastStreetIndex = null;
+    let currentStreetLocation = null;
+    let currentStreetCoords = null;
+    let currentStreetHeading = 0;
+    let currentStreetPitch = 0;
 
     function getRandomStreetLocation() {
       if (!streetViewLocations.length) {
-        return [20, 0];
+        return { label: 'Unknown', coords: [20, 0] };
       }
       let index = Math.floor(Math.random() * streetViewLocations.length);
       if (index === lastStreetIndex) {
@@ -728,36 +736,79 @@ function initWordScramble(container) {
     }
 
     function streetImageFallback(location) {
-      const query = encodeURIComponent(`${location.label} street`);
-      return `https://source.unsplash.com/640x420/?${query}`;
+      const query = encodeURIComponent(`${location.label} street view`);
+      return `https://source.unsplash.com/random/640x420?${query}&sig=${Date.now()}`;
     }
 
     function buildStreetViewSources(location) {
-      const heading = Math.floor(Math.random() * 360);
       const sources = [];
-      const query = encodeURIComponent(`${location.label} street`);
+      const query = encodeURIComponent(`${location.label} street view`);
 
       if (googleStreetViewKey) {
         sources.push({
-          url: `https://maps.googleapis.com/maps/api/streetview?size=640x420&location=${location.coords[0]},${location.coords[1]}&heading=${heading}&pitch=0&key=${googleStreetViewKey}`,
+          url: `https://maps.googleapis.com/maps/api/streetview?size=640x420&location=${currentStreetCoords[0]},${currentStreetCoords[1]}&heading=${currentStreetHeading}&pitch=${currentStreetPitch}&key=${googleStreetViewKey}`,
           label: `Google Street View at ${location.label}`,
           type: 'google'
         });
       }
 
       sources.push({
-        url: `https://images.unsplash.com/photo-1494526585095-c41746248156?w=640&h=420&fit=crop&auto=format&fm=jpg&q=80&sig=${Date.now()}`,
-        label: `Street photo fallback image`, 
+        url: `https://source.unsplash.com/random/640x420?${query}&sig=${Date.now()}`,
+        label: `Street photo fallback for ${location.label}`,
         type: 'fallback'
       });
 
       sources.push({
-        url: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=640&h=420&fit=crop&auto=format&fm=jpg&q=80&sig=${Date.now()}`,
-        label: `Street photo alternate fallback`, 
+        url: `https://source.unsplash.com/random/640x420?${query},city&sig=${Date.now()}`,
+        label: `Alternate street photo fallback for ${location.label}`,
         type: 'fallback'
       });
 
       return sources;
+    }
+
+    function moveLatLng(latlng, headingDeg, distanceKm) {
+      const R = 6371;
+      const brng = toRadians(headingDeg);
+      const lat1 = toRadians(latlng[0]);
+      const lon1 = toRadians(latlng[1]);
+      const d = distanceKm / R;
+
+      const lat2 = Math.asin(Math.sin(lat1) * Math.cos(d) + Math.cos(lat1) * Math.sin(d) * Math.cos(brng));
+      const lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(d) * Math.cos(lat1), Math.cos(d) - Math.sin(lat1) * Math.sin(lat2));
+
+      return [lat2 * 180 / Math.PI, lon2 * 180 / Math.PI];
+    }
+
+    function setCurrentStreetLocation(location) {
+      currentStreetLocation = location;
+      currentStreetCoords = [...location.coords];
+      currentStreetHeading = Math.floor(Math.random() * 360);
+      currentStreetPitch = 0;
+      updateStreetViewInfo();
+    }
+
+    function updateStreetViewInfo() {
+      if (!streetViewStatus || !streetViewLabel || !currentStreetLocation) return;
+      streetViewLabel.textContent = `${currentStreetLocation.label} · ${Math.round(currentStreetHeading)}°`;
+      if (googleStreetViewKey) {
+        streetViewStatus.textContent = `Use the controls to rotate or move along the street.`;
+      } else {
+        streetViewStatus.textContent = `Fallback street photo for ${currentStreetLocation.label}. Add a Google Street View API key for real Street View.`;
+      }
+    }
+
+    function rotateStreetView(delta) {
+      currentStreetHeading = (currentStreetHeading + delta + 360) % 360;
+      updateStreetViewInfo();
+      updateStreetViewImage(currentStreetLocation);
+    }
+
+    function moveStreetView(distanceKm) {
+      if (!currentStreetCoords) return;
+      currentStreetCoords = moveLatLng(currentStreetCoords, currentStreetHeading, distanceKm);
+      updateStreetViewInfo();
+      updateStreetViewImage(currentStreetLocation);
     }
 
     function loadStreetViewSource(location, sources, index = 0) {
@@ -795,10 +846,10 @@ function initWordScramble(container) {
     }
 
     function updateStreetViewImage(location) {
-      if (!streetViewImage || !streetViewLabel || !streetViewPanel || !streetViewStatus) return;
+      if (!streetViewImage || !streetViewLabel || !streetViewPanel || !streetViewStatus || !location) return;
       streetViewImage.alt = `Loading street view for ${location.label}...`;
       streetViewLabel.textContent = `Loading ${location.label}`;
-      streetViewStatus.textContent = googleStreetViewKey ? 'Loading Google Street View...' : 'Loading fallback street photo; add a Google Street View API key for real Street View imagery.';
+      streetViewStatus.textContent = googleStreetViewKey ? 'Loading Google Street View...' : `Loading fallback street photo for ${location.label}...`;
       streetViewPanel.classList.remove('street-view-error');
       streetViewPanel.classList.toggle('street-view-fallback', !googleStreetViewKey);
       const sources = buildStreetViewSources(location);
@@ -838,8 +889,7 @@ function initWordScramble(container) {
     roundEl.textContent = round;
     guessing = false;
     const location = getRandomStreetLocation();
-    trueLatLng = location.coords;
-    updateStreetViewImage(location);
+    trueLatLng = location.coords;    setCurrentStreetLocation(location);    updateStreetViewImage(location);
     try { guessMap.setView([20, 0], 2); } catch (e) {}
   }
     makeBtn.addEventListener('click', () => {
@@ -875,6 +925,24 @@ function initWordScramble(container) {
     if (connector) guessMap.fitBounds(connector.getBounds().pad(0.3));
     else guessMap.setView(trueLatLng, 3);
   });
+
+    if (streetRotateLeft) {
+      streetRotateLeft.addEventListener('click', () => rotateStreetView(-30));
+    }
+    if (streetRotateRight) {
+      streetRotateRight.addEventListener('click', () => rotateStreetView(30));
+    }
+    if (streetMoveForward) {
+      streetMoveForward.addEventListener('click', () => moveStreetView(0.12));
+    }
+    if (streetNewView) {
+      streetNewView.addEventListener('click', () => {
+        if (!currentStreetLocation) return;
+        currentStreetHeading = Math.floor(Math.random() * 360);
+        updateStreetViewInfo();
+        updateStreetViewImage(currentStreetLocation);
+      });
+    }
 
     nextBtn.addEventListener('click', () => {
     startNewRound();

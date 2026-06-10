@@ -144,6 +144,39 @@ svg {
     backdrop-filter: blur(6px);
   }
 
+  .street-view-controls {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 2;
+    flex-wrap: wrap;
+  }
+
+  .street-view-controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(0, 0, 0, 0.45);
+    color: #f8f1d8;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+
+  .street-view-controls button:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .street-view-controls button:active {
+    transform: translateY(1px);
+  }
+
   .street-view-panel.street-view-error {
     border-color: #d45f37;
   }
