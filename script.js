@@ -731,36 +731,64 @@ function initWordScramble(container) {
       return `https://source.unsplash.com/640x420/?${query}`;
     }
 
+    function buildStreetViewSources(location) {
+      const heading = Math.floor(Math.random() * 360);
+      const sources = [];
+
+      if (googleStreetViewKey) {
+        sources.push({
+          url: `https://maps.googleapis.com/maps/api/streetview?size=640x420&location=${location.coords[0]},${location.coords[1]}&heading=${heading}&pitch=0&key=${googleStreetViewKey}`,
+          label: `Google Street View at ${location.label}`,
+          type: 'google'
+        });
+      }
+
+      const query = encodeURIComponent(`${location.label} street`);
+      sources.push({
+        url: `https://source.unsplash.com/640x420/?${query}`,
+        label: `Street photo near ${location.label}`,
+        type: 'unsplash'
+      });
+
+      sources.push({
+        url: `https://images.unsplash.com/photo-1494526585095-c41746248156?w=640&h=420&fit=crop&auto=format&fm=jpg&q=80&sig=${Date.now()}`,
+        label: `Street photo fallback image`, 
+        type: 'fallback'
+      });
+
+      return sources;
+    }
+
+    function loadStreetViewSource(location, sources, index = 0) {
+      if (!streetViewImage || !streetViewLabel || !streetViewPanel) return;
+      if (index >= sources.length) {
+        streetViewImage.src = '';
+        streetViewImage.alt = `Street photo could not be loaded for ${location.label}`;
+        streetViewLabel.textContent = `Unable to load image`;
+        streetViewPanel.classList.add('street-view-error');
+        return;
+      }
+
+      const source = sources[index];
+      const tester = new Image();
+      tester.onload = () => {
+        streetViewImage.src = source.url;
+        streetViewImage.alt = source.label;
+        streetViewLabel.textContent = source.type === 'google' ? location.label : `${location.label} (street photo)`;
+        streetViewPanel.classList.remove('street-view-error');
+      };
+      tester.onerror = () => {
+        loadStreetViewSource(location, sources, index + 1);
+      };
+      tester.src = source.url;
+    }
+
     function updateStreetViewImage(location) {
       if (!streetViewImage || !streetViewLabel || !streetViewPanel) return;
-      const heading = Math.floor(Math.random() * 360);
-      const baseUrl = `https://maps.googleapis.com/maps/api/streetview?size=640x420&location=${location.coords[0]},${location.coords[1]}&heading=${heading}&pitch=0`;
-      const apiUrl = googleStreetViewKey ? `${baseUrl}&key=${googleStreetViewKey}` : null;
-
-      streetViewImage.onload = () => {
-        streetViewPanel.classList.remove('street-view-error');
-      };
-      streetViewImage.onerror = () => {
-        streetViewImage.onerror = null;
-        const fallbackUrl = streetImageFallback(location);
-        streetViewImage.src = fallbackUrl;
-        streetViewImage.alt = `Street photo near ${location.label}`;
-        streetViewLabel.textContent = `${location.label} (street photo)`;
-        streetViewPanel.classList.add('street-view-error');
-      };
-
-      if (apiUrl) {
-        streetViewImage.src = apiUrl;
-        streetViewImage.alt = `Google Street View at ${location.label}`;
-        streetViewLabel.textContent = `${location.label}`;
-      } else {
-        streetViewImage.onerror = null;
-        const fallbackUrl = streetImageFallback(location);
-        streetViewImage.src = fallbackUrl;
-        streetViewImage.alt = `Street photo near ${location.label}`;
-        streetViewLabel.textContent = `${location.label} (street photo)`;
-        streetViewPanel.classList.remove('street-view-error');
-      }
+      streetViewImage.alt = `Loading street view for ${location.label}...`;
+      streetViewPanel.classList.remove('street-view-error');
+      const sources = buildStreetViewSources(location);
+      loadStreetViewSource(location, sources, 0);
     }
 
   let trueLatLng = null;
